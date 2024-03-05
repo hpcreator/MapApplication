@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="str_current_weather">Current Weather</string>
+    <string name="str_5_days_forecast">5 Days Forecast</string>
+    <string name="str_choose">Choose</string>
+    <string name="str_dismiss">Dismiss</string>
+    <string name="str_temperature">Temperature</string>
+    <string name="str_humidity">Humidity</string>
+    <string name="str_pressure">Pressure</string>
+    <string name="str_weather">Weather</string>
+</resources>
