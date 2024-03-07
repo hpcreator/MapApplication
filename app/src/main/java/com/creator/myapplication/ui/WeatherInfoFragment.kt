@@ -5,10 +5,12 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.creator.myapplication.R
 import com.creator.myapplication.adapter.WeatherAdapter
 import com.creator.myapplication.base.BaseFragment
 import com.creator.myapplication.databinding.FragmentWeatherInfoBinding
+import com.creator.myapplication.model.LatLong
 import com.creator.myapplication.network.ApiResponse
 import com.creator.myapplication.utils.ApiConstants.APP_ID
 import com.creator.myapplication.viewmodel.MainViewModel
@@ -21,14 +23,16 @@ class WeatherInfoFragment : BaseFragment() {
     private val weatherAdapter: WeatherAdapter by lazy {
         WeatherAdapter()
     }
+    private lateinit var latLong: LatLong
+    private val locationArgs: WeatherInfoFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setView(R.layout.fragment_weather_info)
-
     }
 
     override fun initView() {
+        latLong = locationArgs.latLong
         binding = getBinding()
         binding.apply {
             toolbar.setNavigationOnClickListener {
@@ -65,61 +69,63 @@ class WeatherInfoFragment : BaseFragment() {
     }
 
     private fun getWeatherInformationFromApi() {
-        loginViewModel.getCurrentWeather(lats = 23.034150034973457, longs = 72.51066810493813, appId = APP_ID)
-            .observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiResponse.Success -> {
-                        hideProgressDialog()
-                        if (it.data != null) {
-                            binding.apply {
-                                weatherInfo = it.data
-                            }
+        loginViewModel.getCurrentWeather(
+            lats = latLong.lat, longs = latLong.long, appId = APP_ID
+        ).observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResponse.Success -> {
+                    hideProgressDialog()
+                    if (it.data != null) {
+                        binding.apply {
+                            weatherInfo = it.data
                         }
                     }
+                }
 
-                    is ApiResponse.Error -> {
-                        Log.e("TAG", "getWeatherInformationFromApi: ${it.message.toString()}")
-                        hideProgressDialog()
-                    }
+                is ApiResponse.Error -> {
+                    Log.e("TAG", "getWeatherInformationFromApi: ${it.message.toString()}")
+                    hideProgressDialog()
+                }
 
-                    is ApiResponse.Loading -> {
-                        showProgressDialog()
-                    }
+                is ApiResponse.Loading -> {
+                    showProgressDialog()
+                }
 
-                    else -> {
-                        hideProgressDialog()
-                    }
+                else -> {
+                    hideProgressDialog()
                 }
             }
+        }
     }
 
     private fun getForecastInformation() {
-        loginViewModel.getForecast(lats = 23.034150034973457, longs = 72.51066810493813, appId = APP_ID)
-            .observe(viewLifecycleOwner) {
-                when (it) {
-                    is ApiResponse.Success -> {
-                        hideProgressDialog()
-                        if (it.data != null) {
-                            with(it.data) {
-                                weatherAdapter.nameOfCity = city?.name.toString()
-                                weatherAdapter.setList(list)
-                            }
+        loginViewModel.getForecast(
+            lats = latLong.lat, longs = latLong.long, appId = APP_ID
+        ).observe(viewLifecycleOwner) {
+            when (it) {
+                is ApiResponse.Success -> {
+                    hideProgressDialog()
+                    if (it.data != null) {
+                        with(it.data) {
+                            weatherAdapter.nameOfCity = city?.name.toString()
+                            weatherAdapter.setList(list)
                         }
                     }
+                }
 
-                    is ApiResponse.Error -> {
-                        Log.e("TAG", "getWeatherInformationFromApi: ${it.message.toString()}")
-                        hideProgressDialog()
-                    }
+                is ApiResponse.Error -> {
+                    Log.e("TAG", "getWeatherInformationFromApi: ${it.message.toString()}")
+                    hideProgressDialog()
+                }
 
-                    is ApiResponse.Loading -> {
-                        showProgressDialog()
-                    }
+                is ApiResponse.Loading -> {
+                    showProgressDialog()
+                }
 
-                    else -> {
-                        hideProgressDialog()
-                    }
+                else -> {
+                    hideProgressDialog()
                 }
             }
+        }
     }
 }
